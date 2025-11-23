@@ -27,8 +27,12 @@ COPY requirements.txt .
 # Instalar dependencias Python
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Descargar modelo de spaCy (usar pip en lugar de spacy download)
-RUN pip install --no-cache-dir https://github.com/explosion/spacy-models/releases/download/es_core_news_sm-3.7.1/es_core_news_sm-3.7.1-py3-none-any.whl
+# Descargar modelo de spaCy
+# Usar pip install directo ya que spacy download puede fallar en Docker
+# Compatible con spacy 3.7.2
+RUN pip install --no-cache-dir https://github.com/explosion/spacy-models/releases/download/es_core_news_sm-3.7.0/es_core_news_sm-3.7.0-py3-none-any.whl || \
+    pip install --no-cache-dir https://github.com/explosion/spacy-models/releases/download/es_core_news_sm-3.7.1/es_core_news_sm-3.7.1-py3-none-any.whl || \
+    python -m spacy download es_core_news_sm
 
 # Copiar código de la aplicación
 COPY . .
