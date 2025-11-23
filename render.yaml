@@ -1,0 +1,24 @@
+services:
+  - type: web
+    name: jurismed-backend
+    env: docker
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: ./backend
+    envVars:
+      - key: CORS_ORIGINS
+        value: https://jurismed-frontend.onrender.com
+      - key: PYTHONUNBUFFERED
+        value: 1
+    healthCheckPath: /health
+    plan: free
+
+  - type: web
+    name: jurismed-frontend
+    env: docker
+    dockerfilePath: ./frontend/Dockerfile
+    dockerContext: ./frontend
+    envVars:
+      - key: REACT_APP_API_URL
+        value: https://jurismed-backend.onrender.com
+    plan: free
+
