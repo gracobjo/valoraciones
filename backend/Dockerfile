@@ -27,11 +27,11 @@ COPY requirements.txt .
 # Instalar dependencias Python
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Descargar modelo de spaCy (opcional - se puede hacer después si es necesario)
-# Intentar instalar modelo compatible con spacy 3.7.2
-# Si falla, el modelo se puede instalar después o hacer opcional
-RUN pip install --no-cache-dir https://github.com/explosion/spacy-models/releases/download/es_core_news_sm-3.7.0/es_core_news_sm-3.7.0-py3-none-any.whl || \
-    echo "Warning: Modelo spaCy no instalado. La aplicación funcionará con regex básico."
+# Instalar modelo de spaCy (opcional, el código usa principalmente regex)
+# Usar versión disponible o saltar si no está disponible
+RUN pip install --no-cache-dir "https://github.com/explosion/spacy-models/releases/download/es_core_news_sm-3.7.0/es_core_news_sm-3.7.0.tar.gz" || \
+    pip install --no-cache-dir "https://github.com/explosion/spacy-models/releases/download/es_core_news_sm-3.6.0/es_core_news_sm-3.6.0.tar.gz" || \
+    echo "INFO: Modelo spaCy no instalado. La aplicación usa regex y funcionará correctamente sin él."
 
 # Copiar código de la aplicación
 COPY . .
