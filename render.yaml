@@ -11,6 +11,7 @@ services:
         value: 1
     healthCheckPath: /health
     plan: free
+    region: oregon
 
   - type: web
     name: jurismed-frontend
@@ -18,7 +19,11 @@ services:
     dockerfilePath: ./frontend/Dockerfile
     dockerContext: ./frontend
     envVars:
-      - key: REACT_APP_API_URL
-        value: https://jurismed-backend.onrender.com
+      - key: BACKEND_URL
+        fromService:
+          name: jurismed-backend
+          type: web
+          property: url
     plan: free
+    region: oregon
 

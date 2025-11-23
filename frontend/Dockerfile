@@ -21,15 +21,25 @@ RUN npm run build
 # Stage 2: Production
 FROM nginx:alpine
 
+# Instalar herramientas necesarias
+RUN apk add --no-cache gettext
+
 # Copiar archivos construidos
 COPY --from=builder /app/dist /usr/share/nginx/html
 
-# Copiar configuración de nginx
-COPY nginx.conf /etc/nginx/conf.d/default.conf
+# Crear directorio para templates
+RUN mkdir -p /etc/nginx/templates
+
+# Copiar template de configuración de nginx
+COPY nginx.conf.template /etc/nginx/templates/
+
+# Copiar script de entrada
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
 
 # Exponer puerto
 EXPOSE 80
 
-# Iniciar nginx
-CMD ["nginx", "-g", "daemon off;"]
+# Usar script de entrada
+ENTRYPOINT ["/entrypoint.sh"]
 
