@@ -1,0 +1,47 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: jurismed-backend
+    ports:
+      - "8000:8000"
+    environment:
+      - PYTHONUNBUFFERED=1
+    volumes:
+      # Montar código para desarrollo (opcional, comentar en producción)
+      - ./backend:/app
+      # Volumen para modelos de ML (opcional)
+      - ml-models:/app/models
+    networks:
+      - jurismed-network
+    healthcheck:
+      test: ["CMD", "python", "-c", "import requests; requests.get('http://localhost:8000/health')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: jurismed-frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    networks:
+      - jurismed-network
+    restart: unless-stopped
+
+volumes:
+  ml-models:
+
+networks:
+  jurismed-network:
+    driver: bridge
+

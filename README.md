@@ -425,6 +425,38 @@ Las contribuciones son bienvenidas. Por favor:
 4. Push a la rama (`git push origin feature/nueva-funcionalidad`)
 5. Abre un Pull Request
 
+## 🐳 Dockerización
+
+La aplicación está completamente dockerizada y lista para desplegar. Ver [DOCKER.md](DOCKER.md) para instrucciones detalladas.
+
+### Inicio Rápido con Docker
+
+```bash
+# Construir y ejecutar
+docker-compose up --build
+
+# Acceder a la aplicación
+# Frontend: http://localhost
+# Backend API: http://localhost:8000/docs
+```
+
+### Publicar en Docker Hub
+
+```bash
+# Construir imágenes
+docker-compose build
+
+# Etiquetar
+docker tag jurismed-backend:latest tu-usuario/jurismed-backend:latest
+docker tag jurismed-frontend:latest tu-usuario/jurismed-frontend:latest
+
+# Subir
+docker push tu-usuario/jurismed-backend:latest
+docker push tu-usuario/jurismed-frontend:latest
+```
+
+Para más información sobre despliegue en servicios gratuitos (Railway, Render, Fly.io), consulta [DOCKER.md](DOCKER.md).
+
 ## 📄 Licencia
 
 Este proyecto es de código abierto. Ver archivo `LICENSE` para más detalles.

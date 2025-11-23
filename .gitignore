@@ -47,6 +47,13 @@ models/
 *.pt
 *.pth
 
+# Documentos de ejemplo (PDFs, DOCX, etc.)
+*.pdf
+*.docx
+*.doc
+# Mantener solo los archivos de ejemplo necesarios si los hay
+# !docs/**/*.pdf
 
-
-
+# Docker
+.docker/
+docker-compose.override.yml

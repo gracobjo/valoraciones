@@ -1,0 +1,27 @@
+# Archivos y directorios a ignorar en el contexto de Docker
+.git
+.gitignore
+*.md
+!README.md
+*.pdf
+*.docx
+*.doc
+.vscode
+.idea
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+node_modules
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.env
+.env.local
+*.log
+*.db
+*.sqlite
+*.sqlite3
+
