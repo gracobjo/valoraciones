@@ -19,11 +19,11 @@ services:
     dockerfilePath: ./frontend/Dockerfile
     dockerContext: ./frontend
     envVars:
-      - key: BACKEND_URL
+      - key: BACKEND_HOST
         fromService:
           name: jurismed-backend
           type: web
-          property: url
+          property: host
     plan: free
     region: oregon
 

@@ -80,10 +80,12 @@ Si prefieres crear los servicios manualmente:
    - **Plan**: `Free`
 
 4. **Variables de Entorno**:
-   ```
-   BACKEND_URL=https://jurismed-backend.onrender.com
-   ```
-   ⚠️ **Importante**: Reemplaza `jurismed-backend` con el nombre real de tu servicio backend
+   - Render configurará automáticamente `BACKEND_HOST` desde el servicio backend
+   - O puedes configurar manualmente `BACKEND_URL` con la URL completa:
+     ```
+     BACKEND_URL=https://jurismed-backend.onrender.com
+     ```
+   ⚠️ **Importante**: Si creas los servicios manualmente, asegúrate de configurar `BACKEND_HOST` o `BACKEND_URL`
 
 5. **Click en "Create Web Service"**
 
@@ -148,8 +150,14 @@ Si el frontend y backend tienen nombres diferentes:
 **Causa**: El backend no está disponible o la URL es incorrecta
 **Solución**:
 1. Verifica que el backend esté corriendo
-2. Verifica que `BACKEND_URL` en el frontend apunte a la URL correcta
-3. Asegúrate de que la URL termine con `/` (ej: `https://backend.onrender.com/`)
+2. Verifica las variables de entorno del frontend:
+   - `BACKEND_HOST` debe estar configurada (automática con Blueprint)
+   - O configura `BACKEND_URL` manualmente con la URL completa: `https://tu-backend.onrender.com`
+3. Revisa los logs del frontend para ver qué URL está usando:
+   ```bash
+   # En Render Dashboard → Frontend Service → Logs
+   # Busca: "Nginx config generated with BACKEND_URL: ..."
+   ```
 
 ### El servicio se "duerme"
 
