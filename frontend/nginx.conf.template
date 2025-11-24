@@ -16,19 +16,27 @@ server {
     }
 
     # Proxy para API
-    location /api {
+    location /api/ {
+        # Usar variable de entorno para URL del backend
+        # IMPORTANTE: La URL debe terminar con / para que nginx reescriba correctamente
         proxy_pass ${BACKEND_URL};
         proxy_http_version 1.1;
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection 'upgrade';
-        proxy_set_header Host $host;
+        proxy_set_header Host $proxy_host;
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto $scheme;
         proxy_cache_bypass $http_upgrade;
         
-        # Headers adicionales para CORS
+        # Reescribir headers para CORS
         proxy_set_header Origin "";
+        proxy_redirect off;
+        
+        # Timeouts
+        proxy_connect_timeout 60s;
+        proxy_send_timeout 60s;
+        proxy_read_timeout 60s;
     }
 
     # Cache estático

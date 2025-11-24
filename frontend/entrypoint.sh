@@ -24,10 +24,15 @@ else
   FINAL_BACKEND_URL="http://backend:8000"
 fi
 
-# Asegurar que la URL termine con / para proxy_pass
+# Asegurar que la URL termine con / para proxy_pass (requerido por nginx)
+# Pero primero extraer la parte del host para validación
 case "$FINAL_BACKEND_URL" in
-  */) ;;
-  *) FINAL_BACKEND_URL="${FINAL_BACKEND_URL}/" ;;
+  */) 
+    # Ya termina con /, perfecto
+    ;;
+  *) 
+    FINAL_BACKEND_URL="${FINAL_BACKEND_URL}/"
+    ;;
 esac
 
 # Validar que la URL tenga esquema (http:// o https://)
