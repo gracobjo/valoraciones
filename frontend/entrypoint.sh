@@ -24,15 +24,10 @@ else
   FINAL_BACKEND_URL="http://backend:8000"
 fi
 
-# Asegurar que la URL termine con / para proxy_pass (requerido por nginx)
-case "$FINAL_BACKEND_URL" in
-  */) 
-    # Ya termina con /, perfecto
-    ;;
-  *) 
-    FINAL_BACKEND_URL="${FINAL_BACKEND_URL}/"
-    ;;
-esac
+# NO agregar / al final - nginx necesita la URL exacta para proxy_pass
+# Cuando proxy_pass termina con /, nginx reescribe la ruta
+# Cuando NO termina con /, nginx pasa la ruta completa incluyendo /api
+# Para mantener /api en el path, NO agregamos / al final
 
 # Validar que la URL tenga esquema (http:// o https://)
 case "$FINAL_BACKEND_URL" in
