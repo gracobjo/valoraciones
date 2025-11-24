@@ -274,6 +274,10 @@ class NLPService:
             r"(?:SEXTO|SÉPTIMO|OCTAVO|NOVENO|DÉCIMO)[\.-]+\s*(?:.|\n)*?[-•]\s*([A-ZÁÉÍÓÚÑ][a-záéíóúñ\s,()0-9]{5,150})(?:[\.;:\n]|$)",
             # Listas con guiones o viñetas
             r"^[-•]\s*([A-ZÁÉÍÓÚÑ][a-záéíóúñ\s,()0-9]{5,150})(?:[\.;:\n]|$)",
+            # Diagnósticos en hechos probados (formato narrativo)
+            r"(?:hechos\s+probados|hecho\s+probado)[\s:](?:.|\n){0,500}?(?:diagnóstico|diagnostico|con\s+diagnóstico|con\s+diagnostico)[\s:]+(?:de\s+)?([A-ZÁÉÍÓÚÑ][a-záéíóúñ\s,()0-9]{5,100})(?:[\.;,\n]|$)",
+            # Diagnósticos mencionados en contexto de incapacidad/enfermedad
+            r"(?:incapacidad|enfermedad|proceso)[\s:]+(?:.|\n){0,200}?(?:diagnóstico|diagnostico|con\s+diagnóstico|con\s+diagnostico)[\s:]+(?:de\s+)?([A-ZÁÉÍÓÚÑ][a-záéíóúñ\s,()0-9]{5,100})(?:[\.;,\n]|$)",
         ]
         
         seen_diagnoses = set()
@@ -354,8 +358,14 @@ class NLPService:
                 "limitación", "movilidad", "adaptativo"
             ]
             
+            # También permitir diagnósticos que mencionan dolor/síntoma + parte del cuerpo
+            # Ejemplo: "Dolor en el tobillo", "Dolor lumbar", etc.
+            symptom_body_pattern = r"(?:dolor|dolores|limitación|limitaciones|deficiencia|deficiencias|lesión|lesiones)\s+(?:en|de|del|de la|del|en el|en la)\s+(?:el|la|los|las)?\s*(?:hombro|codo|muñeca|mano|dedo|cadera|rodilla|tobillo|pie|tarso|cervical|dorsal|lumbar|columna)"
+            
             has_strong_term = any(re.search(r'\b' + re.escape(term) + r'\b', text_lower) for term in strong_medical_terms)
-            if not has_strong_term:
+            has_symptom_body = bool(re.search(symptom_body_pattern, text_lower, re.IGNORECASE))
+            
+            if not has_strong_term and not has_symptom_body:
                 return False
             
             # 5. No debe ser solo una palabra anatómica o vaga (pero permitir si tiene contexto)
