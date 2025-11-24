@@ -86,7 +86,7 @@ server {
         proxy_set_header Host $BACKEND_HOSTNAME;
         proxy_set_header X-Real-IP \$remote_addr;
         proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto https;
+        proxy_set_header X-Forwarded-Proto \$scheme;
         proxy_set_header X-Forwarded-Host \$host;
         proxy_set_header Connection "";
         
@@ -103,9 +103,15 @@ server {
         # SSL verification para HTTPS
         proxy_ssl_server_name on;
         proxy_ssl_verify off;
+        proxy_ssl_protocols TLSv1.2 TLSv1.3;
         
         # No interceptar errores - pasar directamente
         proxy_intercept_errors off;
+        
+        # Manejo de errores mejorado
+        proxy_next_upstream error timeout invalid_header http_500 http_502 http_503;
+        proxy_next_upstream_tries 2;
+        proxy_next_upstream_timeout 10s;
         
         # Logging detallado
         access_log /var/log/nginx/api_access.log;
@@ -128,6 +134,28 @@ echo "BACKEND_HOST env var: ${BACKEND_HOST:-NOT SET}"
 echo "BACKEND_URL env var: ${BACKEND_URL:-NOT SET}"
 echo "FINAL_BACKEND_URL: $FINAL_BACKEND_URL"
 echo "BACKEND_HOSTNAME: $BACKEND_HOSTNAME"
+echo "=========================================="
+
+# Verificar conectividad con el backend (solo si es HTTPS)
+if echo "$FINAL_BACKEND_URL" | grep -q "^https://"; then
+    echo "Testing backend connectivity..."
+    BACKEND_HOST_ONLY=$(echo "$FINAL_BACKEND_URL" | sed -E 's|https?://([^/]+).*|\1|')
+    if command -v wget >/dev/null 2>&1; then
+        if wget --spider --timeout=5 --tries=1 "$FINAL_BACKEND_URL/health" 2>/dev/null; then
+            echo "✓ Backend is reachable at $FINAL_BACKEND_URL/health"
+        else
+            echo "⚠ WARNING: Cannot reach backend at $FINAL_BACKEND_URL/health"
+            echo "  This may be normal if the backend is sleeping (Render Free plan)"
+        fi
+    elif command -v curl >/dev/null 2>&1; then
+        if curl -f -s --max-time 5 "$FINAL_BACKEND_URL/health" >/dev/null 2>&1; then
+            echo "✓ Backend is reachable at $FINAL_BACKEND_URL/health"
+        else
+            echo "⚠ WARNING: Cannot reach backend at $FINAL_BACKEND_URL/health"
+            echo "  This may be normal if the backend is sleeping (Render Free plan)"
+        fi
+    fi
+fi
 echo "=========================================="
 
 # Validar que el archivo de configuración se generó correctamente
