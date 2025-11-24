@@ -74,31 +74,31 @@ server {
         try_files \$uri \$uri/ /index.html;
     }
 
-    # Proxy para API - captura tanto /api como /api/
+    # Proxy para API
     location /api {
-        # Reescribir la ruta: quitar /api y pasar el resto al backend
-        rewrite ^/api/?(.*) /\$1 break;
+        # Proxy a la URL completa del backend
         proxy_pass $FINAL_BACKEND_URL;
         proxy_http_version 1.1;
-        proxy_set_header Upgrade \$http_upgrade;
-        proxy_set_header Connection 'upgrade';
-        proxy_set_header Host \$host;
+        
+        # Headers importantes
+        proxy_set_header Host $BACKEND_HOSTNAME;
         proxy_set_header X-Real-IP \$remote_addr;
         proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto \$scheme;
-        proxy_cache_bypass \$http_upgrade;
+        proxy_set_header X-Forwarded-Host \$host;
         proxy_set_header Origin "";
-        proxy_redirect off;
         
-        # Timeouts más largos para procesamiento de documentos grandes
+        # Desactivar buffering para streams
+        proxy_buffering off;
+        proxy_request_buffering off;
+        
+        # Timeouts extendidos para procesamiento de documentos grandes
         proxy_connect_timeout 300s;
         proxy_send_timeout 300s;
         proxy_read_timeout 300s;
         
-        # Buffer sizes para archivos grandes
-        client_max_body_size 10M;
-        proxy_buffering off;
-        proxy_request_buffering off;
+        # Manejo de errores
+        proxy_next_upstream error timeout invalid_header http_500 http_502 http_503;
     }
 
     # Cache estático
