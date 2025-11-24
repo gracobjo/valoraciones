@@ -99,7 +99,21 @@ class OCRService:
                 # Palabras clave que indican contenido real del documento (no solo metadatos)
                 # Excluir "discapacidad" si solo aparece en contexto de registro/trámite
                 content_keywords = ["resolución", "determina que", "diagnóstico", "m75", "lesión", "hombro", "anexo", "baremo", "grado de discapacidad", "reconocimiento del grado"]
+                
+                # Palabras clave médicas más amplias para detectar contenido médico real
+                medical_keywords = [
+                    "diagnóstico", "lesión", "patología", "enfermedad", "síndrome", "trastorno",
+                    "rotura", "fractura", "artrosis", "artritis", "tendinitis", "bursitis",
+                    "limitación", "movilidad", "dolor", "deficiencia", "discapacidad",
+                    "exploración", "examen", "prueba", "pruebas complementarias",
+                    "pericial", "dictamen", "informe médico", "valoración", "baremo",
+                    "capítulo", "anexo", "clase", "grado", "porcentaje", "via"
+                ]
+                
                 has_content = False
+                medical_keywords_found = 0
+                
+                # Verificar palabras clave de contenido administrativo/judicial
                 for keyword in content_keywords:
                     if keyword in text_lower:
                         # Verificar que no esté en contexto de registro/trámite
@@ -114,7 +128,17 @@ class OCRService:
                                 has_content = True
                                 break
                 
+                # Contar palabras clave médicas encontradas
+                for keyword in medical_keywords:
+                    if keyword in text_lower:
+                        medical_keywords_found += 1
+                
+                # Si encontramos al menos 3 palabras clave médicas, consideramos que hay contenido
+                if medical_keywords_found >= 3:
+                    has_content = True
+                
                 self._add_log(f"Tiene encabezado: {has_header}, Tiene contenido real: {has_content}, Tiene enlace externo: {has_external_link}")
+                self._add_log(f"Palabras clave médicas encontradas: {medical_keywords_found}/{len(medical_keywords)}")
                 
                 # Si tiene enlace externo, es probable que el contenido real esté en otra URL
                 if has_external_link:
@@ -131,6 +155,7 @@ class OCRService:
                 # Si tiene encabezado pero NO tiene contenido real, FORZAR OCR
                 # O si el texto es muy corto (< 1000 caracteres)
                 # O si el texto tiene más de 1000 caracteres pero solo contiene metadatos (más del 80% es encabezado)
+                # O si no se encontraron suficientes palabras clave médicas (< 3)
                 should_use_ocr = False
                 
                 # Calcular porcentaje de texto que es encabezado
@@ -154,6 +179,10 @@ class OCRService:
                     should_use_ocr = True
                 elif has_header and header_percentage > 80:
                     self._add_log(f"Texto parece ser principalmente metadatos ({header_percentage:.1f}% encabezado). FORZANDO OCR...", "WARNING")
+                    should_use_ocr = True
+                elif content_length > 0 and medical_keywords_found < 3:
+                    # Si hay texto pero pocas palabras clave médicas, probablemente es un PDF escaneado mal extraído
+                    self._add_log(f"Texto extraído pero pocas palabras clave médicas ({medical_keywords_found} < 3). FORZANDO OCR...", "WARNING")
                     should_use_ocr = True
                 
                 if should_use_ocr:
