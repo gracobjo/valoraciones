@@ -730,18 +730,18 @@ function App() {
       <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
         <div className="p-4">
           <Brain className="w-6 h-6 text-purple-500 mx-auto mb-2" />
-          <h3 className="font-semibold text-sm">Minería de Texto</h3>
-          <p className="text-xs text-slate-400">Extrae "Hechos Probados" de sentencias</p>
+          <h3 className="font-semibold text-sm text-slate-800">Minería de Texto</h3>
+          <p className="text-xs text-slate-600">Extrae "Hechos Probados" de sentencias</p>
         </div>
         <div className="p-4">
-          <BookOpen className="w-6 h-6 text-indigo-500 mx-auto mb-2" />
-          <h3 className="font-semibold text-sm">RD 888/2022</h3>
-          <p className="text-xs text-slate-400">Aplica reglas de Clases y Grados</p>
+          <BookOpen className="w-6 h-6 text-indigo-600 mx-auto mb-2" />
+          <h3 className="font-semibold text-sm text-slate-800">RD 888/2022</h3>
+          <p className="text-xs text-slate-600">Aplica reglas de Clases y Grados</p>
         </div>
         <div className="p-4">
-          <Eye className="w-6 h-6 text-emerald-500 mx-auto mb-2" />
-          <h3 className="font-semibold text-sm">Auditoría Legal</h3>
-          <p className="text-xs text-slate-400">Detecta incongruencias administrativas</p>
+          <Eye className="w-6 h-6 text-emerald-600 mx-auto mb-2" />
+          <h3 className="font-semibold text-sm text-slate-800">Auditoría Legal</h3>
+          <p className="text-xs text-slate-600">Detecta incongruencias administrativas</p>
         </div>
       </div>
     </div>
@@ -980,7 +980,7 @@ function App() {
                         <li key={i} className="text-sm text-slate-600 bg-blue-50 p-2 rounded border border-blue-100">{d}</li>
                       ))
                     ) : (
-                      <li className="text-sm text-slate-400 italic">No se detectaron diagnósticos</li>
+                      <li className="text-sm text-slate-600 italic">No se detectaron diagnósticos</li>
                     )}
                   </ul>
                   {medicalLimitations.length > 0 && (
@@ -1002,20 +1002,20 @@ function App() {
                   {adminClassification ? (
                     <>
                       <div className="mb-4">
-                        <p className="text-xs text-slate-400 uppercase font-bold">Clasificación</p>
+                        <p className="text-xs text-slate-600 uppercase font-bold">Clasificación</p>
                         <p className="text-sm font-medium text-slate-700">
                           {adminClassification.description || `Clase ${adminClassification.class_number || 'N/A'}`}
                         </p>
                       </div>
                       <div className="flex justify-between items-center bg-white p-3 rounded-lg border border-slate-200 shadow-sm">
                         <div>
-                          <p className="text-xs text-slate-400 uppercase font-bold">Grado</p>
+                          <p className="text-xs text-slate-600 uppercase font-bold">Grado</p>
                           <p className="text-2xl font-bold text-slate-800">
                             {adminClassification.suggested_percentage || 'N/A'}%
                           </p>
                         </div>
                         <div className="text-right">
-                          <p className="text-xs text-slate-400 uppercase font-bold">Clase</p>
+                          <p className="text-xs text-slate-600 uppercase font-bold">Clase</p>
                           <Badge type="info">Clase {adminClassification.class_number || 'N/A'}</Badge>
                         </div>
                       </div>
@@ -1156,7 +1156,7 @@ function App() {
                       )}
                     </div>
                   ) : (
-                    <p className="text-sm text-slate-400 italic">No hay resolución administrativa cargada</p>
+                    <p className="text-sm text-slate-600 italic">No hay resolución administrativa cargada</p>
                   )}
                 </div>
               </div>
@@ -1447,12 +1447,12 @@ function App() {
                           <span className="font-bold text-indigo-600" aria-label={`Baremo de deficiencia global de la persona: ${finalValuation.bdgp_percentage || 0} por ciento`}>{finalValuation.bdgp_percentage || 0}%</span>
                           {finalValuation.via && (
                             <>
-                              <span className="text-slate-400" aria-hidden="true">→</span>
+                              <span className="text-slate-600" aria-hidden="true">→</span>
                               <span className="text-slate-600"><AccessibleTooltip acronym="VIA">VIA</AccessibleTooltip>:</span>
                               <span className="font-bold text-indigo-600" aria-label={`Valor inicial de ajuste: ${finalValuation.via} por ciento`}>{finalValuation.via}%</span>
                               {finalValuation.adjustment > 0 && (
                                 <>
-                                  <span className="text-slate-400" aria-hidden="true">+</span>
+                                  <span className="text-slate-600" aria-hidden="true">+</span>
                                   <span className="text-slate-600">Ajuste:</span>
                                   <span className="font-bold text-indigo-600" aria-label={`Ajuste por baremos complementarios: más ${finalValuation.adjustment} por ciento`}>+{finalValuation.adjustment}%</span>
                                 </>
@@ -1461,12 +1461,12 @@ function App() {
                           )}
                           {finalValuation.bfca_score > 0 && (
                             <>
-                              <span className="text-slate-400" aria-hidden="true">+</span>
+                              <span className="text-slate-600" aria-hidden="true">+</span>
                               <span className="text-slate-600"><AccessibleTooltip acronym="BFCA">BFCA</AccessibleTooltip>:</span>
                               <span className="font-bold text-indigo-600" aria-label={`Baremo de factores contextuales y barreras ambientales: más ${finalValuation.bfca_score} puntos`}>+{finalValuation.bfca_score} pts</span>
                             </>
                           )}
-                          <span className="text-slate-400" aria-hidden="true">=</span>
+                          <span className="text-slate-600" aria-hidden="true">=</span>
                           <span className="text-2xl font-bold text-indigo-700" aria-label={`Grado de discapacidad ajustado final: ${finalValuation.gda_percentage || finalValuation.total_percentage || 0} por ciento`}>
                             {finalValuation.gda_percentage || finalValuation.total_percentage || 0}%
                           </span>
@@ -1485,45 +1485,45 @@ function App() {
 
             {/* Valoración Final (GDA) */}
             {finalValuation && (finalValuation.gda_percentage !== undefined || finalValuation.total_percentage !== undefined) && (
-              <Card className="bg-gradient-to-r from-blue-600 to-purple-600 text-white border-0">
+              <Card className="bg-gradient-to-r from-blue-50 to-indigo-50 border-2 border-blue-200">
                 <div className="p-6">
                   <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center gap-2">
-                      <Scale className="w-6 h-6" />
-                      <h3 className="text-xl font-bold">
+                      <Scale className="w-6 h-6 text-blue-700" />
+                      <h3 className="text-xl font-bold text-slate-900">
                         Grado de Discapacidad Ajustado (<AccessibleTooltip acronym="GDA">GDA</AccessibleTooltip>)
                       </h3>
                     </div>
-                    <Badge type="success" className="bg-white/20 text-white border-white/30" title="Artículo 4.2 del Real Decreto 888/2022" ariaLabel="Artículo 4.2 del Real Decreto 888/2022">
+                    <Badge type="success" className="bg-blue-100 text-blue-800 border-blue-300" title="Artículo 4.2 del Real Decreto 888/2022" ariaLabel="Artículo 4.2 del Real Decreto 888/2022">
                       Art. 4.2 RD 888/2022
                     </Badge>
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-                    <div className="bg-white/10 rounded-lg p-4 backdrop-blur-sm">
-                      <p className="text-white/80 text-xs uppercase mb-1">GDA Final</p>
-                      <p className="text-4xl font-bold">{finalValuation.gda_percentage || finalValuation.total_percentage || 0}%</p>
+                    <div className="bg-white rounded-lg p-4 border border-slate-200 shadow-sm">
+                      <p className="text-slate-600 text-xs uppercase mb-1 font-semibold">GDA Final</p>
+                      <p className="text-4xl font-bold text-blue-700">{finalValuation.gda_percentage || finalValuation.total_percentage || 0}%</p>
                       {finalValuation.bdgp_percentage && (
-                        <p className="text-white/70 text-xs mt-1">
+                        <p className="text-slate-600 text-xs mt-1">
                           <AccessibleTooltip acronym="BDGP">BDGP</AccessibleTooltip>: {finalValuation.bdgp_percentage}%
                         </p>
                       )}
                     </div>
-                    <div className="bg-white/10 rounded-lg p-4 backdrop-blur-sm">
-                      <p className="text-white/80 text-xs uppercase mb-1">Clase</p>
-                      <p className="text-2xl font-bold">Clase {finalValuation.final_class || 'N/A'}</p>
-                      <p className="text-white/80 text-sm mt-1">{finalValuation.description || 'Deficiencia'}</p>
+                    <div className="bg-white rounded-lg p-4 border border-slate-200 shadow-sm">
+                      <p className="text-slate-600 text-xs uppercase mb-1 font-semibold">Clase</p>
+                      <p className="text-2xl font-bold text-blue-700">Clase {finalValuation.final_class || 'N/A'}</p>
+                      <p className="text-slate-700 text-sm mt-1">{finalValuation.description || 'Deficiencia'}</p>
                     </div>
-                    <div className="bg-white/10 rounded-lg p-4 backdrop-blur-sm">
-                      <p className="text-white/80 text-xs uppercase mb-1">Componentes</p>
-                      <p className="text-2xl font-bold">{finalValuation.components_count || 0}</p>
-                      <p className="text-white/80 text-sm mt-1">deficiencia(s)</p>
+                    <div className="bg-white rounded-lg p-4 border border-slate-200 shadow-sm">
+                      <p className="text-slate-600 text-xs uppercase mb-1 font-semibold">Componentes</p>
+                      <p className="text-2xl font-bold text-blue-700">{finalValuation.components_count || 0}</p>
+                      <p className="text-slate-700 text-sm mt-1">deficiencia(s)</p>
                     </div>
                   </div>
                   
                   {/* Lista detallada de deficiencias */}
                   {chapterValuations && chapterValuations.length > 0 && (
-                    <div className="bg-white/10 rounded-lg p-4 backdrop-blur-sm mt-4">
-                      <p className="text-white/90 text-sm font-semibold mb-3">Deficiencias valoradas ({chapterValuations.length}):</p>
+                    <div className="bg-white rounded-lg p-4 border border-slate-200 shadow-sm mt-4">
+                      <p className="text-slate-800 text-sm font-semibold mb-3">Deficiencias valoradas ({chapterValuations.length}):</p>
                       <div className="space-y-2 max-h-64 overflow-y-auto">
                         {chapterValuations.map((val, i) => (
                           <button
@@ -1533,26 +1533,26 @@ function App() {
                                 handleHighlightText(val.text_position.start, val.text_position.end, val.diagnosis)
                               }
                             }}
-                            className="w-full text-left bg-white/5 hover:bg-white/10 rounded-lg p-3 transition-colors border border-white/10 hover:border-white/20"
+                            className="w-full text-left bg-slate-50 hover:bg-blue-50 rounded-lg p-3 transition-colors border border-slate-200 hover:border-blue-300"
                             title={val.text_position ? "Clic para ver en el documento" : "Posición no disponible"}
                           >
                             <div className="flex items-start justify-between gap-2">
                               <div className="flex-1">
-                                <p className="text-white text-sm font-medium mb-1">
+                                <p className="text-slate-900 text-sm font-medium mb-1">
                                   {i + 1}. {val.diagnosis || 'Diagnóstico no especificado'}
                                 </p>
-                                <div className="flex items-center gap-2 text-xs text-white/70">
+                                <div className="flex items-center gap-2 text-xs text-slate-600">
                                   <span>{val.chapter || val.chapter_number || 'N/A'}</span>
                                   <span>•</span>
-                                  <Badge type="info" className="bg-white/20 text-white border-white/30 text-xs">
+                                  <Badge type="info" className="bg-blue-100 text-blue-800 border-blue-300 text-xs">
                                     Clase {val.class || val.class_number || 'N/A'}
                                   </Badge>
                                   <span>•</span>
-                                  <span className="font-bold text-white">{val.percentage || 0}%</span>
+                                  <span className="font-bold text-blue-700">{val.percentage || 0}%</span>
                                 </div>
                               </div>
                               {val.text_position && val.text_position.start !== null && (
-                                <FileText className="w-4 h-4 text-white/60 flex-shrink-0 mt-1" />
+                                <FileText className="w-4 h-4 text-slate-400 flex-shrink-0 mt-1" />
                               )}
                             </div>
                           </button>
@@ -1563,42 +1563,42 @@ function App() {
                   
                   {/* Desglose de baremos */}
                   {(finalValuation.bla_score > 0 || finalValuation.brp_score > 0 || finalValuation.bfca_score > 0) && (
-                    <div className="bg-white/10 rounded-lg p-3 backdrop-blur-sm mb-3">
-                      <p className="text-white/90 text-xs font-semibold mb-2">Desglose de Baremos:</p>
+                    <div className="bg-white rounded-lg p-3 border border-slate-200 shadow-sm mb-3">
+                      <p className="text-slate-800 text-xs font-semibold mb-2">Desglose de Baremos:</p>
                       <div className="grid grid-cols-3 gap-2 text-xs">
                         {finalValuation.bla_score > 0 && (
                           <div>
-                            <span className="text-white/70">
+                            <span className="text-slate-600">
                               <AccessibleTooltip acronym="BLA">BLA</AccessibleTooltip> (<AccessibleTooltip acronym="BLA">Anexo IV</AccessibleTooltip>):
                             </span>
-                            <span className="text-white font-bold ml-1">{finalValuation.bla_score}</span>
+                            <span className="text-slate-900 font-bold ml-1">{finalValuation.bla_score}</span>
                           </div>
                         )}
                         {finalValuation.brp_score > 0 && (
                           <div>
-                            <span className="text-white/70">
+                            <span className="text-slate-600">
                               <AccessibleTooltip acronym="BRP">BRP</AccessibleTooltip> (<AccessibleTooltip acronym="BRP">Anexo V</AccessibleTooltip>):
                             </span>
-                            <span className="text-white font-bold ml-1">{finalValuation.brp_score}</span>
+                            <span className="text-slate-900 font-bold ml-1">{finalValuation.brp_score}</span>
                           </div>
                         )}
                         {finalValuation.bfca_score > 0 && (
                           <div>
-                            <span className="text-white/70">
+                            <span className="text-slate-600">
                               <AccessibleTooltip acronym="BFCA">BFCA</AccessibleTooltip> (<AccessibleTooltip acronym="BFCA">Anexo VI</AccessibleTooltip>):
                             </span>
-                            <span className="text-white font-bold ml-1">{finalValuation.bfca_score}/24</span>
+                            <span className="text-slate-900 font-bold ml-1">{finalValuation.bfca_score}/24</span>
                           </div>
                         )}
                       </div>
                     </div>
                   )}
                   
-                  <div className="bg-white/10 rounded-lg p-3 backdrop-blur-sm">
-                    <p className="text-white/90 text-xs">
+                  <div className="bg-white rounded-lg p-3 border border-slate-200 shadow-sm">
+                    <p className="text-slate-800 text-xs">
                       <span className="font-semibold">Cálculo (Art. 4.2):</span>
                     </p>
-                    <p className="text-white/80 text-xs mt-1" aria-label="Fórmula de cálculo del grado de discapacidad ajustado">
+                    <p className="text-slate-700 text-xs mt-1" aria-label="Fórmula de cálculo del grado de discapacidad ajustado">
                       {finalValuation.formula || (
                         <>
                           <AccessibleTooltip acronym="BDGP">BDGP</AccessibleTooltip> + <AccessibleTooltip acronym="BLA">BLA</AccessibleTooltip> + <AccessibleTooltip acronym="BRP">BRP</AccessibleTooltip> + <AccessibleTooltip acronym="BFCA">BFCA</AccessibleTooltip> = <AccessibleTooltip acronym="GDA">GDA</AccessibleTooltip>
@@ -1606,7 +1606,7 @@ function App() {
                       )}
                     </p>
                     {finalValuation.legal_basis && (
-                      <p className="text-white/70 text-xs mt-1 italic">
+                      <p className="text-slate-600 text-xs mt-1 italic">
                         {finalValuation.legal_basis}
                       </p>
                     )}
@@ -1671,7 +1671,7 @@ function App() {
                         alert('No hay documentos analizados para generar el informe')
                       }
                     }}
-                    className="w-full mt-4 bg-white hover:bg-white/90 text-blue-600 py-3 rounded-lg font-medium transition-colors flex items-center justify-center gap-2"
+                    className="w-full mt-4 bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-medium transition-colors flex items-center justify-center gap-2 shadow-md"
                   >
                     <FileText className="w-4 h-4" />
                     Generar Informe Legal Completo
@@ -2099,7 +2099,7 @@ function App() {
   }, [analyses, inconsistencies, step, loading, showDocumentViewer, highlightedRange, report, showReport, inconsistencyReport, showInconsistencyReport, setStep, setAnalyses, setInconsistencies, setLoading, handleAnalysisComplete, handleCheckInconsistencies, handleGenerateInconsistencyReport, handleHighlightText, setShowDocumentViewer, setHighlightedRange, setReport, setShowReport, setShowInconsistencyReport, setInconsistencyReport])
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-600 via-purple-600 to-purple-800">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
       {step === 'upload' && renderUploadJsx}
       {step === 'analyzing' && renderAnalyzingJsx}
       {step === 'results' && renderResultsJsx}
