@@ -70,11 +70,13 @@ server {
 
     # Proxy para API
     location /api {
-        # Proxy a la URL completa del backend
-        proxy_pass $FINAL_BACKEND_URL;
+        # Usar variable de nginx para proxy_pass dinámico
+        set \$backend_url "$FINAL_BACKEND_URL";
+        proxy_pass \$backend_url;
+        
         proxy_http_version 1.1;
         
-        # Headers importantes
+        # Headers importantes - usar hostname del backend para SSL
         proxy_set_header Host $BACKEND_HOSTNAME;
         proxy_set_header X-Real-IP \$remote_addr;
         proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
@@ -82,17 +84,26 @@ server {
         proxy_set_header X-Forwarded-Host \$host;
         proxy_set_header Origin "";
         
-        # Desactivar buffering para streams
+        # Desactivar buffering para streams de archivos grandes
         proxy_buffering off;
         proxy_request_buffering off;
         
-        # Timeouts extendidos para procesamiento de documentos grandes
+        # Timeouts extendidos (5 minutos) para procesamiento de documentos
         proxy_connect_timeout 300s;
         proxy_send_timeout 300s;
         proxy_read_timeout 300s;
         
-        # Manejo de errores
-        proxy_next_upstream error timeout invalid_header http_500 http_502 http_503;
+        # Manejo de errores del backend
+        proxy_next_upstream error timeout invalid_header http_500 http_502 http_503 http_504;
+        
+        # Headers CORS adicionales
+        add_header Access-Control-Allow-Origin * always;
+        add_header Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS" always;
+        add_header Access-Control-Allow-Headers "Content-Type, Authorization" always;
+        
+        # Logging para debugging
+        access_log /var/log/nginx/api_access.log;
+        error_log /var/log/nginx/api_error.log;
     }
 
     # Cache estático
