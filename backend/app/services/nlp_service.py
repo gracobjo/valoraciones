@@ -375,6 +375,28 @@ class NLPService:
 
             return True
         
+        # --- ESTRATEGIA 0: Buscar diagnósticos en formato de lista (hechos probados) ---
+        # Detectar listas con guiones o viñetas que contienen diagnósticos
+        list_pattern = r"(?:^|\n)\s*[-•]\s*([A-ZÁÉÍÓÚÑ][^\.\n]{10,150})(?:\.|$|\n)"
+        list_matches = re.finditer(list_pattern, text, re.MULTILINE)
+        for match in list_matches:
+            diagnosis_text = match.group(1).strip()
+            
+            # Limpiar el texto (quitar paréntesis con fechas, etc.)
+            diagnosis_text = re.sub(r'\s*\([^)]*\)\s*', '', diagnosis_text).strip()
+            
+            # Validar que sea un diagnóstico válido
+            if is_valid_diagnosis(diagnosis_text):
+                normalized = re.sub(r'\s+', ' ', diagnosis_text.lower())
+                if normalized not in seen_diagnoses:
+                    seen_diagnoses.add(normalized)
+                    entities["DIAGNOSIS"].append({
+                        "text": diagnosis_text,
+                        "start": match.start(1),
+                        "end": match.end(1),
+                        "source": "hechos_probados"
+                    })
+        
         # --- ESTRATEGIA 1: Buscar diagnósticos de la LISTA BLANCA (Prioridad Alta) ---
         for pattern in valid_diagnoses_whitelist:
             matches = re.finditer(pattern, text, re.IGNORECASE | re.MULTILINE)
