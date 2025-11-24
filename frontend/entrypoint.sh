@@ -74,35 +74,36 @@ server {
     }
 
     # Proxy para API
-    # El frontend envía /api/analyze, y el backend espera /api/analyze
-    # IMPORTANTE: Sin / al final, nginx mantiene la ruta completa
+    # Frontend envía /api/analyze -> Backend espera /api/analyze
     location /api {
-        # Usar variable nginx para proxy_pass dinámico
-        set \$backend "$FINAL_BACKEND_URL";
+        # Sin rewrite - nginx pasa la ruta completa cuando proxy_pass no termina con /
+        set \$backend_upstream "$FINAL_BACKEND_URL";
+        proxy_pass \$backend_upstream;
         
-        # Reescribir la ruta: mantener /api en el path
-        rewrite ^/api(.*) /api\$1 break;
-        
-        proxy_pass \$backend;
         proxy_http_version 1.1;
         
-        # Headers críticos
+        # Headers críticos - usar hostname del backend para SSL/TLS
         proxy_set_header Host $BACKEND_HOSTNAME;
         proxy_set_header X-Real-IP \$remote_addr;
         proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto https;
         proxy_set_header X-Forwarded-Host \$host;
+        proxy_set_header Connection "";
         
         # Desactivar buffering para archivos grandes
         proxy_buffering off;
         proxy_request_buffering off;
         
-        # Timeouts extendidos
-        proxy_connect_timeout 60s;
+        # Timeouts - conexión corta, lectura larga
+        proxy_connect_timeout 30s;
         proxy_send_timeout 300s;
         proxy_read_timeout 300s;
         
-        # Manejo de errores
+        # SSL verification para HTTPS
+        proxy_ssl_server_name on;
+        proxy_ssl_verify off;
+        
+        # No interceptar errores - pasar directamente
         proxy_intercept_errors off;
         
         # Logging detallado
