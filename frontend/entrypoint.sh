@@ -94,10 +94,11 @@ server {
         proxy_buffering off;
         proxy_request_buffering off;
         
-        # Timeouts - conexión corta, lectura larga
-        proxy_connect_timeout 30s;
-        proxy_send_timeout 300s;
-        proxy_read_timeout 300s;
+        # Timeouts extendidos para OCR (puede tardar varios minutos)
+        # En Render Free, el OCR puede tardar 5-10 minutos en documentos grandes
+        proxy_connect_timeout 60s;
+        proxy_send_timeout 600s;  # 10 minutos para enviar
+        proxy_read_timeout 600s;  # 10 minutos para leer respuesta
         
         # SSL verification para HTTPS
         proxy_ssl_server_name on;

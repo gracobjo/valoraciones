@@ -11,7 +11,8 @@ if __name__ == "__main__":
         port=8000,
         reload=True,
         log_level="info",
-        timeout_keep_alive=300,  # 5 minutos para archivos grandes
+        timeout_keep_alive=600,  # 10 minutos para OCR de documentos grandes
+        timeout_graceful_shutdown=30,
         limit_concurrency=10,
         limit_max_requests=100
     )
