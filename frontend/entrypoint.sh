@@ -25,7 +25,6 @@ else
 fi
 
 # Asegurar que la URL termine con / para proxy_pass (requerido por nginx)
-# Pero primero extraer la parte del host para validación
 case "$FINAL_BACKEND_URL" in
   */) 
     # Ya termina con /, perfecto
@@ -46,8 +45,53 @@ case "$FINAL_BACKEND_URL" in
     ;;
 esac
 
-# Reemplazar placeholder en el template
-sed "s|\${BACKEND_URL}|$FINAL_BACKEND_URL|g" /etc/nginx/templates/nginx.conf.template > /etc/nginx/conf.d/default.conf
+# Escapar la URL para uso en sed (reemplazar / con \/)
+ESCAPED_URL=$(echo "$FINAL_BACKEND_URL" | sed 's|[\/&]|\\&|g')
+
+# Generar archivo de configuración de nginx
+cat > /etc/nginx/conf.d/default.conf <<EOF
+server {
+    listen 80;
+    server_name localhost;
+    root /usr/share/nginx/html;
+    index index.html;
+
+    # Gzip compression
+    gzip on;
+    gzip_vary on;
+    gzip_min_length 1024;
+    gzip_types text/plain text/css text/xml text/javascript application/x-javascript application/xml+rss application/json;
+
+    # SPA routing - todas las rutas van a index.html
+    location / {
+        try_files \$uri \$uri/ /index.html;
+    }
+
+    # Proxy para API
+    location /api/ {
+        proxy_pass $FINAL_BACKEND_URL;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade \$http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host \$proxy_host;
+        proxy_set_header X-Real-IP \$remote_addr;
+        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto \$scheme;
+        proxy_cache_bypass \$http_upgrade;
+        proxy_set_header Origin "";
+        proxy_redirect off;
+        proxy_connect_timeout 60s;
+        proxy_send_timeout 60s;
+        proxy_read_timeout 60s;
+    }
+
+    # Cache estático
+    location ~* \.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot)\$ {
+        expires 1y;
+        add_header Cache-Control "public, immutable";
+    }
+}
+EOF
 
 # Log para debugging
 echo "Nginx config generated with BACKEND_URL: $FINAL_BACKEND_URL"
@@ -60,9 +104,15 @@ if [ ! -f /etc/nginx/conf.d/default.conf ]; then
   exit 1
 fi
 
-# Mostrar configuración generada (primeras líneas)
-echo "Generated nginx config (first 10 lines):"
-head -10 /etc/nginx/conf.d/default.conf
+# Validar sintaxis de nginx
+nginx -t
+if [ $? -ne 0 ]; then
+  echo "ERROR: Nginx configuration syntax error"
+  cat /etc/nginx/conf.d/default.conf
+  exit 1
+fi
+
+echo "Nginx configuration is valid"
 
 # Iniciar nginx
 exec nginx -g "daemon off;"
