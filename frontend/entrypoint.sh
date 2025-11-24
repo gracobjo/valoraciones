@@ -25,10 +25,13 @@ else
 fi
 
 # Asegurar que la URL NO termine con / al final
-# Cuando proxy_pass NO termina con /, nginx pasa la ruta completa después del rewrite
-# Si termina con /, nginx reescribe y quita parte del path
 # Eliminar cualquier / al final que pueda haber quedado
 FINAL_BACKEND_URL=$(echo "$FINAL_BACKEND_URL" | sed 's|/$||')
+
+# Verificar que la URL sea válida
+if [ -z "$FINAL_BACKEND_URL" ] || [ "$FINAL_BACKEND_URL" = "http://backend:8000" ]; then
+  echo "WARNING: Using default backend URL. This may not work in production!"
+fi
 
 # Validar que la URL tenga esquema (http:// o https://)
 case "$FINAL_BACKEND_URL" in
@@ -72,42 +75,39 @@ server {
 
     # Proxy para API
     # El frontend envía /api/analyze, y el backend espera /api/analyze
-    # Si proxy_pass NO termina con /, nginx pasa la ruta completa (incluyendo /api)
+    # IMPORTANTE: Sin / al final, nginx mantiene la ruta completa
     location /api {
-        # Usar variable para evitar problemas con espacios o caracteres especiales
-        set \$backend_upstream "$FINAL_BACKEND_URL";
-        proxy_pass \$backend_upstream;
+        # Usar variable nginx para proxy_pass dinámico
+        set \$backend "$FINAL_BACKEND_URL";
         
+        # Reescribir la ruta: mantener /api en el path
+        rewrite ^/api(.*) /api\$1 break;
+        
+        proxy_pass \$backend;
         proxy_http_version 1.1;
         
-        # Headers importantes - usar hostname del backend para SSL
+        # Headers críticos
         proxy_set_header Host $BACKEND_HOSTNAME;
         proxy_set_header X-Real-IP \$remote_addr;
         proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto \$scheme;
+        proxy_set_header X-Forwarded-Proto https;
         proxy_set_header X-Forwarded-Host \$host;
-        proxy_set_header Origin "";
         
-        # Desactivar buffering para streams de archivos grandes
+        # Desactivar buffering para archivos grandes
         proxy_buffering off;
         proxy_request_buffering off;
         
-        # Timeouts extendidos (5 minutos) para procesamiento de documentos
-        proxy_connect_timeout 300s;
+        # Timeouts extendidos
+        proxy_connect_timeout 60s;
         proxy_send_timeout 300s;
         proxy_read_timeout 300s;
         
-        # Manejo de errores del backend
-        proxy_next_upstream error timeout invalid_header http_500 http_502 http_503 http_504;
+        # Manejo de errores
+        proxy_intercept_errors off;
         
-        # Headers CORS adicionales
-        add_header Access-Control-Allow-Origin * always;
-        add_header Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS" always;
-        add_header Access-Control-Allow-Headers "Content-Type, Authorization" always;
-        
-        # Logging para debugging
+        # Logging detallado
         access_log /var/log/nginx/api_access.log;
-        error_log /var/log/nginx/api_error.log;
+        error_log /var/log/nginx/api_error.log warn;
     }
 
     # Cache estático
