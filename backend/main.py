@@ -118,6 +118,9 @@ async def analyze_document(
         legal_engine = LegalEngine()
         legal_analysis = await legal_engine.analyze(entities, document_type)
         debug_logs.append("Análisis legal completado")
+        debug_logs.append(f"Diagnósticos detectados: {len(legal_analysis.get('detected_diagnoses', []))}")
+        if legal_analysis.get('detected_diagnoses'):
+            debug_logs.append(f"Lista de diagnósticos: {[d.get('text', str(d)) if isinstance(d, dict) else str(d) for d in legal_analysis.get('detected_diagnoses', [])]}")
         
         # Preparar respuesta
         response_data = {
