@@ -816,17 +816,31 @@ function App() {
 
     // Obtener diagnósticos (usar los deduplicados del análisis legal)
     const getDiagnoses = (data) => {
-      if (!data) return []
+      if (!data) {
+        console.log('⚠️ getDiagnoses: data es null/undefined')
+        return []
+      }
+      
+      console.log('🔍 getDiagnoses - data keys:', Object.keys(data))
+      console.log('🔍 getDiagnoses - legal_analysis:', data.legal_analysis)
       
       // Priorizar diagnósticos deduplicados del análisis legal
       if (data.legal_analysis && data.legal_analysis.detected_diagnoses) {
-        return data.legal_analysis.detected_diagnoses.map(d => 
-          typeof d === 'string' ? d : d.text || d
-        )
+        console.log('✅ Usando detected_diagnoses del análisis legal:', data.legal_analysis.detected_diagnoses)
+        const diagnoses = data.legal_analysis.detected_diagnoses.map(d => {
+          if (typeof d === 'string') return d
+          if (typeof d === 'object' && d !== null) {
+            return d.text || d.diagnosis || JSON.stringify(d)
+          }
+          return String(d)
+        })
+        console.log('📋 Diagnósticos extraídos:', diagnoses)
+        return diagnoses
       }
       
       // Fallback: usar entidades originales si no hay análisis legal
       if (data.entities && data.entities.DIAGNOSIS) {
+        console.log('⚠️ Fallback: usando entities.DIAGNOSIS:', data.entities.DIAGNOSIS)
         // Deduplicar en el frontend también
         const seen = new Set()
         const unique = []
@@ -838,9 +852,11 @@ function App() {
             unique.push(text)
           }
         }
+        console.log('📋 Diagnósticos únicos de entities:', unique)
         return unique
       }
       
+      console.log('❌ No se encontraron diagnósticos en ningún lugar')
       return []
     }
 
