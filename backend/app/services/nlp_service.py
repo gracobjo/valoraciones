@@ -407,6 +407,51 @@ class NLPService:
                         "source": "hechos_probados"
                     })
         
+        # --- ESTRATEGIA 0.5: Buscar diagnósticos en hechos probados (formato narrativo) ---
+        # Ejemplo: "con diagnóstico de Dolor en el tobillo"
+        hechos_narrativo_patterns = [
+            r"(?:con\s+diagnóstico|diagnóstico|diagnostico)[\s:]+(?:de\s+)?([A-ZÁÉÍÓÚÑ][a-záéíóúñ\s,()0-9]{5,100})(?:[\.;,\n]|$)",
+            r"(?:proceso|enfermedad|incapacidad)[\s:]+(?:.|\n){0,100}?(?:con\s+diagnóstico|diagnóstico|diagnostico)[\s:]+(?:de\s+)?([A-ZÁÉÍÓÚÑ][a-záéíóúñ\s,()0-9]{5,100})(?:[\.;,\n]|$)",
+        ]
+        
+        for pattern in hechos_narrativo_patterns:
+            matches = re.finditer(pattern, text, re.IGNORECASE | re.MULTILINE)
+            for match in matches:
+                diagnosis_text = match.group(1).strip() if match.lastindex else match.group(0).strip()
+                
+                # Limpiar el texto - cortar en frases que indican fin del diagnóstico
+                # Ejemplo: "Dolor en el tobillo, en relación al cual" -> "Dolor en el tobillo"
+                cutoff_phrases = [
+                    r",\s*en\s+relaci[óo]n\s+al\s+cual",
+                    r",\s*en\s+relaci[óo]n\s+con",
+                    r",\s*por\s+el\s+cual",
+                    r",\s*por\s+lo\s+cual",
+                    r",\s*siendo",
+                    r",\s*que\s+",
+                    r",\s*el\s+cual",
+                    r",\s*la\s+cual",
+                ]
+                
+                for cutoff in cutoff_phrases:
+                    diagnosis_text = re.split(cutoff, diagnosis_text, flags=re.IGNORECASE)[0].strip()
+                
+                # Limpiar el texto
+                diagnosis_text = diagnosis_text.rstrip('.,;:')
+                diagnosis_text = re.sub(r'^[a-z]{1,4}[,\s]+', '', diagnosis_text, flags=re.IGNORECASE)
+                diagnosis_text = diagnosis_text.strip()
+                
+                # Validar que sea un diagnóstico válido
+                if is_valid_diagnosis(diagnosis_text):
+                    normalized = re.sub(r'\s+', ' ', diagnosis_text.lower())
+                    if normalized not in seen_diagnoses:
+                        seen_diagnoses.add(normalized)
+                        entities["DIAGNOSIS"].append({
+                            "text": diagnosis_text,
+                            "start": match.start(1) if match.lastindex else match.start(),
+                            "end": match.start(1) + len(diagnosis_text) if match.lastindex else match.start() + len(diagnosis_text),
+                            "source": "hechos_probados_narrativo"
+                        })
+        
         # --- ESTRATEGIA 1: Buscar diagnósticos de la LISTA BLANCA (Prioridad Alta) ---
         for pattern in valid_diagnoses_whitelist:
             matches = re.finditer(pattern, text, re.IGNORECASE | re.MULTILINE)
