@@ -72,12 +72,9 @@ server {
 
     # Proxy para API
     # El frontend envía /api/analyze, y el backend espera /api/analyze
-    # Usamos rewrite para mantener la ruta completa al backend
+    # Si proxy_pass NO termina con /, nginx pasa la ruta completa (incluyendo /api)
     location /api {
-        # Reescribir para mantener /api en el path
-        rewrite ^/api(.*) /api\$1 break;
-        
-        # URL del backend SIN / al final para mantener la ruta completa
+        # URL del backend SIN / al final - esto hace que nginx pase la ruta completa
         proxy_pass $FINAL_BACKEND_URL;
         
         proxy_http_version 1.1;
