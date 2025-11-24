@@ -184,8 +184,10 @@ class NLPService:
             r"epoc",
             r"enfermedad\s+pulmonar\s+obstructiva\s+crónica",
             r"asma\s+bronquial",
+            r"síndrome\s+de\s+apnea\s+hipopnea\s+obstructiva\s+del\s+sueño",
             r"síndrome\s+de\s+apnea\s+hipopnea\s+del\s+sueño",
             r"sahs",
+            r"apnea\s+del\s+sueño",
 
             # Sistema Nervioso
             r"accidente\s+cerebrovascular",
@@ -215,6 +217,8 @@ class NLPService:
             r"trastorno\s+bipolar",
             r"esquizofrenia",
             r"trastorno\s+de\s+la\s+personalidad",
+            r"trastorno\s+adaptativo(?:\s+con\s+ansiedad)?",
+            r"trastorno\s+adaptativo\s+con\s+ansiedad",
 
             # Sistema Digestivo
             r"enfermedad\s+por\s+reflujo\s+gastroesofágico",
@@ -245,6 +249,11 @@ class NLPService:
             r"psoriasis",
             r"hipoacusia",
             r"vértigo",
+            r"mareo\s+subjetivo\s+crónico",
+            r"mareo\s+postural\s+perceptivo\s+persistente",
+            r"vestibulopatía\s+bilateral(?:\s+no\s+compensada)?",
+            r"cofosis",
+            r"implante\s+coclear",
             r"acúfenos",
             r"tinnitus",
             r"glaucoma",
@@ -260,6 +269,11 @@ class NLPService:
             r"(?:patología|patologia|enfermedad)[\s:]+([A-ZÁÉÍÓÚÑ][a-záéíóúñ\s,]{5,100})(?:[\.;:\n]|$)",
             # Secciones de conclusiones o antecedentes
             r"(?:conclusiones|consideraciones médico-legales)[\s:](?:.|\n)*?presenta\s+([A-ZÁÉÍÓÚÑ][a-záéíóúñ\s,]{5,100})(?:[\.;:\n]|$)",
+            # Hechos probados en sentencias (formato con guiones o numeración)
+            r"(?:hechos\s+probados|cuadro\s+clínico|presenta\s+el\s+siguiente)[\s:](?:.|\n)*?[-•]\s*([A-ZÁÉÍÓÚÑ][a-záéíóúñ\s,()0-9]{5,150})(?:[\.;:\n]|$)",
+            r"(?:SEXTO|SÉPTIMO|OCTAVO|NOVENO|DÉCIMO)[\.-]+\s*(?:.|\n)*?[-•]\s*([A-ZÁÉÍÓÚÑ][a-záéíóúñ\s,()0-9]{5,150})(?:[\.;:\n]|$)",
+            # Listas con guiones o viñetas
+            r"^[-•]\s*([A-ZÁÉÍÓÚÑ][a-záéíóúñ\s,()0-9]{5,150})(?:[\.;:\n]|$)",
         ]
         
         seen_diagnoses = set()
@@ -335,7 +349,9 @@ class NLPService:
                 "trastorno", "depresión", "depresion", "ansiedad", "distimia",
                 "esquizofrenia", "bipolar",
                 "diabetes", "hipotiroidismo", "hipertiroidismo", "obesidad", "dislipemia",
-                "dermatitis", "psoriasis", "hipoacusia", "vértigo", "glaucoma", "cataratas"
+                "dermatitis", "psoriasis", "hipoacusia", "vértigo", "mareo", "vestibulopatía",
+                "cofosis", "implante", "coclear", "glaucoma", "cataratas",
+                "limitación", "movilidad", "adaptativo"
             ]
             
             has_strong_term = any(re.search(r'\b' + re.escape(term) + r'\b', text_lower) for term in strong_medical_terms)
@@ -499,8 +515,13 @@ class NLPService:
         rating_patterns = [
             r"(?:grado|porcentaje|valoración)[\s:]+(?:de\s+)?(?:discapacidad|minusvalía)?[\s:]+(\d+(?:\.\d+)?)\s*%",
             r"(\d+(?:\.\d+)?)\s*%\s*(?:de\s+)?(?:discapacidad|minusvalía|deficiencia\s+global)",
-            r"(?:reconocimiento|reconocido)[\s:]+(?:del\s+)?(?:grado|porcentaje)[\s:]+(\d+(?:\.\d+)?)\s*%",
+            r"(?:reconocimiento|reconocido|tiene\s+reconocido)[\s:]+(?:por\s+)?(?:la\s+)?(?:Junta|Administración|Gobierno)?[\s:]+(?:un\s+)?(?:grado|porcentaje)[\s:]+(?:de\s+)?(?:discapacidad|minusvalía)[\s:]+(?:del\s+)?(\d+(?:\.\d+)?)\s*%",
+            r"(?:grado\s+de\s+discapacidad\s+del\s+)(\d+(?:\.\d+)?)\s*%",
             r"baremo\s+(\d+(?:\.\d+)?)",
+            # Movilidad reducida
+            r"(?:movilidad\s+reducida|movilidad\s+valorada)[\s:]+(?:en\s+)?(\d+(?:\.\d+)?)\s*(?:puntos?|%)",
+            # Situación de dependencia
+            r"(?:situación\s+de\s+dependencia|grado\s+de\s+dependencia)[\s:]+(?:en\s+)?(?:grado\s+)?(\d+)",
         ]
         
         for pattern in rating_patterns:
