@@ -48,6 +48,10 @@ esac
 # Escapar la URL para uso en sed (reemplazar / con \/)
 ESCAPED_URL=$(echo "$FINAL_BACKEND_URL" | sed 's|[\/&]|\\&|g')
 
+# Extraer solo el hostname de la URL para proxy_set_header Host
+# Esto es necesario porque nginx necesita el hostname correcto
+BACKEND_HOSTNAME=$(echo "$FINAL_BACKEND_URL" | sed -E 's|https?://([^/]+).*|\1|')
+
 # Generar archivo de configuración de nginx
 cat > /etc/nginx/conf.d/default.conf <<EOF
 server {
@@ -55,6 +59,9 @@ server {
     server_name localhost;
     root /usr/share/nginx/html;
     index index.html;
+    
+    # Tamaño máximo de archivo a subir
+    client_max_body_size 10M;
 
     # Gzip compression
     gzip on;
@@ -67,22 +74,31 @@ server {
         try_files \$uri \$uri/ /index.html;
     }
 
-    # Proxy para API
-    location /api/ {
+    # Proxy para API - captura tanto /api como /api/
+    location /api {
+        # Reescribir la ruta: quitar /api y pasar el resto al backend
+        rewrite ^/api/?(.*) /\$1 break;
         proxy_pass $FINAL_BACKEND_URL;
         proxy_http_version 1.1;
         proxy_set_header Upgrade \$http_upgrade;
         proxy_set_header Connection 'upgrade';
-        proxy_set_header Host \$proxy_host;
+        proxy_set_header Host \$host;
         proxy_set_header X-Real-IP \$remote_addr;
         proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto \$scheme;
         proxy_cache_bypass \$http_upgrade;
         proxy_set_header Origin "";
         proxy_redirect off;
-        proxy_connect_timeout 60s;
-        proxy_send_timeout 60s;
-        proxy_read_timeout 60s;
+        
+        # Timeouts más largos para procesamiento de documentos grandes
+        proxy_connect_timeout 300s;
+        proxy_send_timeout 300s;
+        proxy_read_timeout 300s;
+        
+        # Buffer sizes para archivos grandes
+        client_max_body_size 10M;
+        proxy_buffering off;
+        proxy_request_buffering off;
     }
 
     # Cache estático
@@ -95,6 +111,7 @@ EOF
 
 # Log para debugging
 echo "Nginx config generated with BACKEND_URL: $FINAL_BACKEND_URL"
+echo "Backend hostname extracted: $BACKEND_HOSTNAME"
 echo "Backend host: ${BACKEND_HOST:-not set}"
 echo "Backend URL env: ${BACKEND_URL:-not set}"
 
