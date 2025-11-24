@@ -24,6 +24,9 @@ services:
           name: jurismed-backend
           type: web
           property: host
+      # Alternativamente, puedes usar BACKEND_URL directamente:
+      # - key: BACKEND_URL
+      #   value: https://jurismed-backend.onrender.com
     plan: free
     region: oregon
 
