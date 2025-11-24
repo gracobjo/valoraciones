@@ -24,10 +24,9 @@ else
   FINAL_BACKEND_URL="http://backend:8000"
 fi
 
-# NO agregar / al final - nginx necesita la URL exacta para proxy_pass
-# Cuando proxy_pass termina con /, nginx reescribe la ruta
-# Cuando NO termina con /, nginx pasa la ruta completa incluyendo /api
-# Para mantener /api en el path, NO agregamos / al final
+# NO agregar / al final de la URL del backend
+# Cuando proxy_pass NO termina con /, nginx pasa la ruta completa (incluyendo /api)
+# Esto es lo que queremos para que /api/analyze se envíe como /api/analyze al backend
 
 # Validar que la URL tenga esquema (http:// o https://)
 case "$FINAL_BACKEND_URL" in
