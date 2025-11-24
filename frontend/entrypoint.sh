@@ -74,8 +74,9 @@ server {
     # El frontend envía /api/analyze, y el backend espera /api/analyze
     # Si proxy_pass NO termina con /, nginx pasa la ruta completa (incluyendo /api)
     location /api {
-        # URL del backend SIN / al final - esto hace que nginx pase la ruta completa
-        proxy_pass $FINAL_BACKEND_URL;
+        # Usar variable para evitar problemas con espacios o caracteres especiales
+        set \$backend_upstream "$FINAL_BACKEND_URL";
+        proxy_pass \$backend_upstream;
         
         proxy_http_version 1.1;
         
@@ -118,10 +119,14 @@ server {
 EOF
 
 # Log para debugging
-echo "Nginx config generated with BACKEND_URL: $FINAL_BACKEND_URL"
-echo "Backend hostname extracted: $BACKEND_HOSTNAME"
-echo "Backend host: ${BACKEND_HOST:-not set}"
-echo "Backend URL env: ${BACKEND_URL:-not set}"
+echo "=========================================="
+echo "NGINX CONFIGURATION DEBUG INFO"
+echo "=========================================="
+echo "BACKEND_HOST env var: ${BACKEND_HOST:-NOT SET}"
+echo "BACKEND_URL env var: ${BACKEND_URL:-NOT SET}"
+echo "FINAL_BACKEND_URL: $FINAL_BACKEND_URL"
+echo "BACKEND_HOSTNAME: $BACKEND_HOSTNAME"
+echo "=========================================="
 
 # Validar que el archivo de configuración se generó correctamente
 if [ ! -f /etc/nginx/conf.d/default.conf ]; then

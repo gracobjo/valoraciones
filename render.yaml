@@ -19,14 +19,10 @@ services:
     dockerfilePath: ./frontend/Dockerfile
     dockerContext: ./frontend
     envVars:
-      - key: BACKEND_HOST
-        fromService:
-          name: jurismed-backend
-          type: web
-          property: host
-      # Alternativamente, puedes usar BACKEND_URL directamente:
-      # - key: BACKEND_URL
-      #   value: https://jurismed-backend.onrender.com
+      # Usar BACKEND_URL directamente con la URL completa
+      # Esto es más confiable que usar BACKEND_HOST
+      - key: BACKEND_URL
+        value: https://jurismed-backend.onrender.com
     plan: free
     region: oregon
 
