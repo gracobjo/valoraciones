@@ -358,13 +358,20 @@ class NLPService:
             if not has_strong_term:
                 return False
             
-            # 5. No debe ser solo una palabra anatómica o vaga
+            # 5. No debe ser solo una palabra anatómica o vaga (pero permitir si tiene contexto)
             vague_single_words = ["lumbar", "cervical", "dorsal", "ósea", "osea", "óseo", "oseo",
                                 "psiquiátrico", "psiquiatrico", "psiquiátrica", "psiquiatrica",
                                 "crónico", "cronico", "crónica", "cronica", "tipo", "general",
                                 "hombro", "codo", "muñeca", "mano", "cadera", "rodilla", "tobillo", "pie"]
+            # Permitir si tiene más contexto (más de una palabra) o si está en formato de lista (hechos probados)
             if len(text.split()) == 1 and text_lower in vague_single_words:
                 return False
+            
+            # 6. Permitir diagnósticos que empiezan con mayúscula en formato de lista (hechos probados)
+            # Estos suelen ser más confiables
+            if text[0].isupper() and len(text.split()) >= 2:
+                # Si tiene al menos un término médico fuerte, es válido
+                return True
 
             return True
         
