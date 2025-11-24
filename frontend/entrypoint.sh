@@ -74,11 +74,11 @@ server {
     }
 
     # Proxy para API
-    # Frontend envía /api/analyze -> Backend espera /api/analyze
+    # Frontend: /api/analyze -> Backend: /api/analyze
+    # IMPORTANTE: Sin / al final en proxy_pass = nginx mantiene la ruta completa
     location /api {
-        # Sin rewrite - nginx pasa la ruta completa cuando proxy_pass no termina con /
-        set \$backend_upstream "$FINAL_BACKEND_URL";
-        proxy_pass \$backend_upstream;
+        # Usar la URL directamente en proxy_pass (sin variable para mejor compatibilidad)
+        proxy_pass $FINAL_BACKEND_URL;
         
         proxy_http_version 1.1;
         
