@@ -1,5 +1,5 @@
 # Dependencias para la función serverless de Vercel
-# Copiar desde backend/requirements.txt y agregar mangum
+# Versiones optimizadas para Vercel (compatibles con Python 3.12)
 
 # FastAPI y servidor
 fastapi==0.104.1
@@ -10,13 +10,14 @@ python-multipart==0.0.6
 PyMuPDF==1.23.8
 easyocr==1.7.0
 Pillow==10.1.0
-numpy==1.24.3
+numpy>=1.24.3,<2.0.0
 python-docx==1.1.0
 
-# NLP
+# NLP - Versiones compatibles con Python 3.12
 spacy==3.7.2
-transformers==4.35.0
-torch==2.1.0
+# transformers y torch son muy pesados - considerar usar solo si es necesario
+# transformers==4.35.0
+# torch==2.1.0
 
 # Utilidades
 pydantic==2.5.0
