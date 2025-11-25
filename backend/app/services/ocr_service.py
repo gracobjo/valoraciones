@@ -305,6 +305,12 @@ class OCRService:
     
     async def _extract_with_ocr(self, pdf_content: bytes) -> str:
         """Extrae texto de PDFs escaneados usando EasyOCR"""
+        if not EASYOCR_AVAILABLE:
+            raise Exception(
+                "EasyOCR no está disponible. Para PDFs escaneados, se requiere EasyOCR. "
+                "En Vercel, considere usar un servicio externo de OCR o convertir el PDF a texto antes de subirlo."
+            )
+        
         self._add_log(f"Inicializando EasyOCR...")
         try:
             if self.easyocr_reader is None:
