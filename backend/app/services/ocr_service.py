@@ -20,7 +20,14 @@ except (ImportError, AttributeError):
     except AttributeError:
         pass
 
-import easyocr
+# EasyOCR es opcional - muy pesado para Vercel
+try:
+    import easyocr
+    EASYOCR_AVAILABLE = True
+except ImportError:
+    EASYOCR_AVAILABLE = False
+    easyocr = None
+
 from docx import Document  # python-docx para .docx
 
 

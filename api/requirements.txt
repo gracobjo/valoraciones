@@ -1,26 +1,25 @@
-# Dependencias para la función serverless de Vercel
-# Versiones optimizadas para Vercel (compatibles con Python 3.12)
+# Dependencias mínimas para Vercel Serverless Functions
+# Optimizado para reducir el tamaño del paquete
 
 # FastAPI y servidor
 fastapi==0.104.1
 mangum==0.17.0
 python-multipart==0.0.6
 
-# OCR
+# OCR - Solo PyMuPDF (mucho más ligero que easyocr)
 PyMuPDF==1.23.8
-easyocr==1.7.0
 Pillow==10.1.0
 numpy>=1.24.3,<2.0.0
 python-docx==1.1.0
 
-# NLP - Versiones compatibles con Python 3.12
-spacy==3.7.2
-# transformers y torch son muy pesados - considerar usar solo si es necesario
-# transformers==4.35.0
-# torch==2.1.0
+# NLP - NO se usa spacy en el código, solo regex patterns
+# spacy==3.7.2  # Comentado - no se usa
+
+# OCR avanzado - OPCIONAL (muy pesado, solo si se necesita)
+# easyocr==1.7.0  # Comentado - demasiado pesado para Vercel
+# Si se necesita OCR avanzado, considerar usar un servicio externo
 
 # Utilidades
 pydantic==2.5.0
 python-dotenv==1.0.0
 requests==2.31.0
-
