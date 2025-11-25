@@ -10,7 +10,21 @@ class NLPService:
     """Servicio para procesamiento de lenguaje natural"""
     
     def __init__(self):
-        pass
+        # Mapeo de abreviaciones médicas a nombres completos
+        self.abbreviation_expansion = {
+            "toc": "trastorno obsesivo-compulsivo",
+            "tept": "trastorno de estrés postraumático",
+            "hta": "hipertensión arterial",
+            "epoc": "enfermedad pulmonar obstructiva crónica",
+            "irc": "insuficiencia renal crónica",
+            "erc": "enfermedad renal crónica",
+            "hbp": "hiperplasia benigna de próstata",
+            "sahs": "síndrome de apnea hipopnea del sueño",
+            "eii": "enfermedad inflamatoria intestinal",
+            "sii": "síndrome del intestino irritable",
+            "dm": "diabetes mellitus",
+            "acv": "accidente cerebrovascular",
+        }
     
     async def detect_document_type(self, text: str) -> str:
         """
@@ -211,9 +225,9 @@ class NLPService:
             r"sindrome\s+ansioso\s+depresivo",
             r"trastorno\s+mixto\s+ansioso\s+depresivo",
             r"trastorno\s+de\s+estrés\s+postraumático",
-            r"tept",
+            r"\btept\b",
             r"trastorno\s+obsesivo\s+compulsivo",
-            r"toc",
+            r"\btoc\b",
             r"trastorno\s+bipolar",
             r"esquizofrenia",
             r"trastorno\s+de\s+la\s+personalidad",
@@ -457,6 +471,11 @@ class NLPService:
             matches = re.finditer(pattern, text, re.IGNORECASE | re.MULTILINE)
             for match in matches:
                 diagnosis_text = match.group(0).strip()
+                
+                # Expandir abreviaciones a nombres completos
+                diagnosis_text_lower = diagnosis_text.lower()
+                if diagnosis_text_lower in self.abbreviation_expansion:
+                    diagnosis_text = self.abbreviation_expansion[diagnosis_text_lower]
                 
                 # Normalizar y verificar duplicados
                 normalized = re.sub(r'\s+', ' ', diagnosis_text.lower())

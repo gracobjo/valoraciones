@@ -140,8 +140,8 @@ class LegalEngine:
                              "bulimia nerviosa", "adicción", "trastorno por uso de sustancias", "alcoholismo", "drogodependencia"],
                 "patterns": [r"psiqui[áa]trico", r"psicol[óo]gico", r"salud mental", r"trastorno mental",
                              r"depresi[óo]n", r"depresivo", r"distimia", r"bipolar", r"man[íi]a", r"ansiedad",
-                             r"p[áa]nico", r"fobia", r"obsesivo-compulsivo", r"toc", r"estr[é]s postraum[áa]tico",
-                             r"tept", r"adaptaci[óo]n", r"ansioso-depresivo", r"esquizofrenia", r"psicosis",
+                             r"p[áa]nico", r"fobia", r"obsesivo-compulsivo", r"\btoc\b", r"estr[é]s postraum[áa]tico",
+                             r"\btept\b", r"adaptaci[óo]n", r"ansioso-depresivo", r"esquizofrenia", r"psicosis",
                              r"personalidad", r"conducta alimentaria", r"anorexia", r"bulimia", r"adicci[óo]n",
                              r"alcoholismo", r"drogodependencia"]
             }
