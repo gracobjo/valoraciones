@@ -29,17 +29,29 @@ app = FastAPI(
 # Configurar CORS
 # Permitir orígenes desde variables de entorno o valores por defecto
 import os
-default_origins = "http://localhost:5173,http://localhost:3000,http://127.0.0.1:5173,http://localhost,https://*.vercel.app"
-cors_origins_env = os.getenv("CORS_ORIGINS", default_origins)
-cors_origins = [origin.strip() for origin in cors_origins_env.split(",")]
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=cors_origins,
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+# En Vercel, permitir todos los orígenes
+is_vercel = os.getenv("VERCEL") == "1"
+if is_vercel:
+    # En Vercel, permitir todos los orígenes
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=["*"],
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
+else:
+    # En desarrollo, usar orígenes específicos
+    default_origins = "http://localhost:5173,http://localhost:3000,http://127.0.0.1:5173,http://localhost"
+    cors_origins_env = os.getenv("CORS_ORIGINS", default_origins)
+    cors_origins = [origin.strip() for origin in cors_origins_env.split(",")]
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=cors_origins,
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
 
 
 @app.get("/")
