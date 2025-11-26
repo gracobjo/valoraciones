@@ -20,17 +20,6 @@ try:
     from mangum import Mangum
     from main import app
     
-    # Configurar CORS para Vercel
-    import os
-    # Permitir todos los orígenes de Vercel
-    app.add_middleware(
-        type(app.middleware_stack[0].cls) if app.middleware_stack else None,
-        allow_origins=["*"],  # Permitir todos los orígenes en Vercel
-        allow_credentials=True,
-        allow_methods=["*"],
-        allow_headers=["*"],
-    )
-    
     # Crear handler para Vercel usando Mangum
     handler = Mangum(app, lifespan="off")
 except ImportError as e:
