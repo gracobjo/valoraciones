@@ -29,10 +29,9 @@ app = FastAPI(
 # Configurar CORS
 # Permitir orígenes desde variables de entorno o valores por defecto
 import os
-cors_origins = os.getenv(
-    "CORS_ORIGINS",
-    "http://localhost:5173,http://localhost:3000,http://127.0.0.1:5173,http://localhost"
-).split(",")
+default_origins = "http://localhost:5173,http://localhost:3000,http://127.0.0.1:5173,http://localhost,https://*.vercel.app"
+cors_origins_env = os.getenv("CORS_ORIGINS", default_origins)
+cors_origins = [origin.strip() for origin in cors_origins_env.split(",")]
 
 app.add_middleware(
     CORSMiddleware,
@@ -143,9 +142,16 @@ async def analyze_document(
     except Exception as e:
         import traceback
         error_detail = f"Error al analizar el documento: {str(e)}"
+        traceback_str = traceback.format_exc()
         debug_logs.append(f"[ERROR] {error_detail}")
-        debug_logs.append(f"[ERROR] Traceback: {traceback.format_exc()}")
-        raise HTTPException(status_code=500, detail=error_detail)
+        debug_logs.append(f"[ERROR] Traceback: {traceback_str}")
+        # En Vercel, también loguear a stderr para que aparezca en los logs
+        print(f"ERROR en /api/analyze: {error_detail}", file=sys.stderr)
+        print(f"Traceback: {traceback_str}", file=sys.stderr)
+        raise HTTPException(
+            status_code=500, 
+            detail=f"Error al analizar el documento: {str(e)}. Revisa los logs para más detalles."
+        )
 
 
 @app.post("/api/analyze/inconsistencies")

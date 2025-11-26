@@ -8,19 +8,47 @@ from pathlib import Path
 
 # Agregar el directorio backend al path
 backend_path = Path(__file__).parent.parent / "backend"
-sys.path.insert(0, str(backend_path))
+backend_path_str = str(backend_path.resolve())
+if backend_path_str not in sys.path:
+    sys.path.insert(0, backend_path_str)
 
 # Cambiar al directorio backend para imports relativos
-os.chdir(backend_path)
+if os.path.exists(backend_path):
+    os.chdir(backend_path)
 
 try:
     from mangum import Mangum
     from main import app
     
+    # Configurar CORS para Vercel
+    import os
+    # Permitir todos los orígenes de Vercel
+    app.add_middleware(
+        type(app.middleware_stack[0].cls) if app.middleware_stack else None,
+        allow_origins=["*"],  # Permitir todos los orígenes en Vercel
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
+    
     # Crear handler para Vercel usando Mangum
     handler = Mangum(app, lifespan="off")
-except ImportError:
+except ImportError as e:
+    # Log del error para debugging
+    print(f"Error importando módulos: {e}", file=sys.stderr)
+    import traceback
+    traceback.print_exc()
     # Fallback si mangum no está disponible
-    from main import app
-    handler = app
+    try:
+        from main import app
+        handler = app
+    except Exception as e2:
+        print(f"Error crítico: {e2}", file=sys.stderr)
+        traceback.print_exc()
+        raise
+except Exception as e:
+    print(f"Error inicializando handler: {e}", file=sys.stderr)
+    import traceback
+    traceback.print_exc()
+    raise
 
